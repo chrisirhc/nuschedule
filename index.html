@@ -1,0 +1,135 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <title>Timetable - a NUS timetable builder</title>
+    <link rel="stylesheet" href="main.css" type="text/css" media="screen" title="no title" charset="utf-8">
+	<script src="js/jquery.js" type="text/javascript" charset="utf-8"></script>
+	<script src="js/Util.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/Object.js" type="text/javascript" charset="utf-8"></script>
+
+    <script src="js/Ripper.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/TimeTable.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/Set.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/Main.js" type="text/javascript" charset="utf-8"></script>
+    
+    <script src="js/Dragger.js" type="text/javascript" charset="utf-8"></script>
+    
+    <script>
+    tempLink = ['','AR1102', 'AR2223', 'BE1000', 'BFS1001', 'CS1101', 'CS2100', '','','','','',''];
+	function ripInto() {
+		for (i=1;i<12;i++){
+			document.getElementById('code'+i).value=tempLink[i];
+		}
+	}
+    </script>
+
+    
+</head>
+<body onload="st.renderSetRow();" onunload="return false">
+    <div id="status"><p id="stat0">ready</p></div>
+    <div id="setRow"></div>
+    <div id="page">
+        <div id="page1">
+            <div id="showcase">
+                <h1>Timetable <span style="font-size:14px;color:#ccc;font-style:normal">|&#x2C8;t&#x12B;m&#x2CC;t&#x101;b&#x259;l|</span></h1>
+
+                <h2>to build your own timetable using easy timetable builder</h2>
+				<h2>~ June 30, 2008</h2>
+            </div>
+            <div id="showcase2"><input type="button" value="Start the application" class="button" onclick="showPage2()"/>
+				<p>"Timetable" is an unofficial NUS timetable builder<br/>specially designed for arranging modules more efficiently</p>
+			</div>
+			<div id="release_note">
+				<div style="width:800px;margin:0px auto;border-right:1px solid #aaa;padding-right:6px;">
+				<h1>July 25, 2010</h1>
+                <p>chaoszcat has no time to maintain his script and this 'project' is currently hosted by wirelessed and roticv</p>
+				<p>NUS CORS changed the url to the detailed module information. As a result, the 'next' button disappeared. This bug is fixed.<br />
+				</p>
+				<p>Lecture sessions which start/end in half hour blocks (e.g. 1830-2030) will be rounded up to the nearest hour block (e.g. 1800-2100).</p>
+				</div>
+
+				<div style="width:800px;margin:0px auto;border-right:1px solid #aaa;padding-right:6px;">
+				<h1>June 4, 2008</h1>
+				<p>fixing cookie retrieving mechanism</p>
+				<p>fixing typo</p>
+				<p>changing page#2 style</p>
+				</div>
+			</div>
+
+        </div>
+    
+        <div id="page2">
+	<div style="width:800px;margin:0 auto;">
+            <h4><b>Step 1:</b> Add module by module code</h4>
+            <h6 style="margin-bottom:10px;">Please provide module codes that you want to add, max 12</h6>
+            
+            <p style="margin-bottom:10px;color:#f33;">Look Here! <a href="javascript://" onclick="ripInto();ripper.testApplication();">Just wanna test this application? Click here.</a> (I will fill some example for you to play with)</p>
+
+			<script type="text/javascript">
+			d = new Date();
+			year = d.getFullYear();
+			//val1 = (year-1)+'/'+(year); <option value="'+val1+'">'+val1+'</option>
+			val2 = (year)+'/'+(year+1);
+			document.write('<p style="margin:30px 0 10px;">Academic Year: <select id="ay" style="margin-right:10px;"><option value="'+val2+'">'+val2+'</option></select>');
+			document.write('<select id="semester"><option value="1">Semester 1</option><option value="2">Semester 2</option></select></p>');
+			</script>
+            <div id="boxes"></div>
+</div>
+			<div style="background:#000;margin-top:220px;color:#aaa;padding:10px 0 30px;">
+				<div style="width:800px;margin:0 auto;">
+	            	<h4><b>Step 2:</b> Ripping button</h4>
+	            	<h6 style="margin-bottom:10px;">Click <span style="color:#fff">Start Ripping</span> when you have done.<br/>Click <span style="color:#fff">Next</span> if you are ready to start the application, or click <span style="color:#fff">Re-Scan All</span> if you want to re-scan any invalid links</h6>
+
+            
+	            	<p><input type="button" id="ripButton" onmouseup="ripper.start()" value="Start Ripping" class="button" />
+	                <input type="button" id="nextButton" onclick="tt.createTable();tt.createAllNode();st.showSetFunctions();showPage3();this.onclick=''" value="Next" class="button" style="display:none" /></p>
+				</div>
+			</div>
+        </div>
+        
+        <div id="page3">
+            <div id="content">
+                <h4><b>Step 3:</b> What you have to know</h4>
+
+                <p><img src="images/note/1.gif" class="leftAlign" />Drag and drop any time-span of a module anywhere in the screen, provided that they have a small tab in their first cell, so you can hold and drag it. A grayed time-span is fixed and you cannot drag it.</p>
+                <p><img src="images/note/2.gif" class="rightAlign" />So when you hold the tab and start dragging, the application will immediately show you any available slot(s) (a <b style="color:#027;">blue</b> slot) that you can drag onto.</p>
+                <p><img src="images/note/3.gif" class="leftAlign" />When you find your favourite slot and want to drop on it, continue to hold the tab, and <b>touch the slot</b>. The slot will now turns <span style="color:#aa0">yellow</span>. <b>Drop it</b>, and you will have successfully swapped it.</p>
+
+                <p><img src="images/note/4.gif" class="leftAlign" />So this will be the last thing to know. This is <b>Module Viewer</b>. Since this application is built on ripping information from CORS Module Listing, nothing can be done to predict unusual behaviour of certain time-span in a module. To overcome this, I have created this little module viewer. Each small button represents an available time slot of a module. They are grouped in <span style="background:#aaa;padding:0 2px;">Lecture</span>, <span style="background:#fec;padding:0 2px;">Tutorial</span>, and <span style="background:#dff;padding:0 2px;">Laboratory</span>. You can click on them, swapping their status between <span style="color:#55f">on board</span>, <span style="color:#444">fixed on board</span>, and <span style="color:#222">off board</span></p>
+            </div>
+
+        </div>
+    </div>
+    
+    
+    <div id="wrapper"><div id="master"></div></div>
+    <div id="footer"><p>This application is fully created by chaoszcat, aka cwmao or chancs. Before you rip the content, please contact me @ <a href="mailto:chaoszcat@gmail.com">chaoszcat@gmail.com</a><br/>The modules shown here are not guaranteed to be 100% correct. Use at your own risk</p></div>
+    <div id="comment">
+		<div style="margin-left:265px;margin-bottom:4px;"><p onclick="leaveComment()" id="comment_link"><img src="images/comment.png" alt="icon" /><!--Leave comments--></p></div>
+		<div id="comment_body" style="display:none">
+
+			<p><img src="images/user.png" alt="icon" /><input type="text" id="comment_name" size="35" onclick="this.style.borderColor='#ccc'" /></p>
+			<p><img src="images/email.png" alt="icon" /><input type="text" id="comment_email" size="35" onclick="this.style.borderColor='#ccc'" /></p>
+			<p><img src="images/page_edit.png" alt="icon" /><textarea id="comment_content" onclick="this.style.borderColor='#ccc'" ></textarea></p>
+			<p style="margin-left:20px"><input type="button" value="Submit" class="button" style="padding:2px 5px;" onclick="sendComment()"/></p>
+		</div>
+		<div id="comment_feedback"><p>Comment sent!</p></div>
+	
+	</div>
+<div id="tester" style="position:fixed;bottom:20px;color:#f00;font-size:10px;"></div>
+
+<script>
+/*
+if (isIE || isOpera) {
+	document.getElementById('page').style.display='none';
+	document.getElementById('comment').style.display='none';
+	document.getElementById('setRow').style.display='none';
+	document.getElementById('status').style.display='none';
+	document.getElementById('comment_img').style.display='none';
+}
+*/
+</script>
+</body>
+</html>
