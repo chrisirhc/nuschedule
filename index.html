@@ -3,7 +3,7 @@
 <html>
 <head>
     <meta http-equiv="Content-type" content="text/html; charset=utf-8">
-    <title>Timetable - a NUS timetable builder</title>
+    <title>NUSchedule - a NUS timetable builder</title>
     <link rel="stylesheet" href="main.css" type="text/css" media="screen" title="no title" charset="utf-8">
     <script src="js/jquery-1.4.2.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="js/jquery.xdomainajax.js" type="text/javascript" charset="utf-8"></script>
@@ -34,16 +34,14 @@
     <div id="page">
         <div id="page1">
             <div id="showcase">
-                <h1>Timetable <span style="font-size:14px;color:#ccc;font-style:normal">|&#x2C8;t&#x12B;m&#x2CC;t&#x101;b&#x259;l|</span></h1>
-
-                <h2>to build your own timetable using easy timetable builder</h2>
-				<h2>~ June 30, 2008</h2>
+                <h1>NUSchedule App</h1>
             </div>
-            <div id="showcase2"><input type="button" value="Start the application" class="button" onclick="showPage2()"/>
-				<p>"Timetable" is an unofficial NUS timetable builder<br/>specially designed for arranging modules more efficiently</p>
-			</div>
+						<div id="showcase2"><input type="button" value="Let's Begin >>" class="button" onclick="showPage2()"/>
+						</div>
 			<div id="release_note">
 				<div style="width:800px;margin:0px auto;border-right:1px solid #aaa;padding-right:6px;">
+					<h1>August 7, 2010</h1>
+					<p>Chris has created an <a href="http://github.com/chrisirhc/nuschedule/">open source repository</a> for this application and is currently maintaining it.</p>
 				<h1>July 25, 2010</h1>
                 <p>chaoszcat has no time to maintain his script and this 'project' is currently hosted by wirelessed and roticv</p>
 				<p>NUS CORS changed the url to the detailed module information. As a result, the 'next' button disappeared. This bug is fixed.<br />
@@ -106,31 +104,6 @@
     
     
     <div id="wrapper"><div id="master"></div></div>
-    <div id="footer"><p>This application is fully created by chaoszcat, aka cwmao or chancs. Before you rip the content, please contact me @ <a href="mailto:chaoszcat@gmail.com">chaoszcat@gmail.com</a><br/>The modules shown here are not guaranteed to be 100% correct. Use at your own risk</p></div>
-    <div id="comment">
-		<div style="margin-left:265px;margin-bottom:4px;"><p onclick="leaveComment()" id="comment_link"><img src="images/comment.png" alt="icon" /><!--Leave comments--></p></div>
-		<div id="comment_body" style="display:none">
-
-			<p><img src="images/user.png" alt="icon" /><input type="text" id="comment_name" size="35" onclick="this.style.borderColor='#ccc'" /></p>
-			<p><img src="images/email.png" alt="icon" /><input type="text" id="comment_email" size="35" onclick="this.style.borderColor='#ccc'" /></p>
-			<p><img src="images/page_edit.png" alt="icon" /><textarea id="comment_content" onclick="this.style.borderColor='#ccc'" ></textarea></p>
-			<p style="margin-left:20px"><input type="button" value="Submit" class="button" style="padding:2px 5px;" onclick="sendComment()"/></p>
-		</div>
-		<div id="comment_feedback"><p>Comment sent!</p></div>
-	
-	</div>
-<div id="tester" style="position:fixed;bottom:20px;color:#f00;font-size:10px;"></div>
-
-<script>
-/*
-if (isIE || isOpera) {
-	document.getElementById('page').style.display='none';
-	document.getElementById('comment').style.display='none';
-	document.getElementById('setRow').style.display='none';
-	document.getElementById('status').style.display='none';
-	document.getElementById('comment_img').style.display='none';
-}
-*/
-</script>
+    <div id="footer"><p>This application was created by Lionel Chan. Victor Loh and Colin Tan has also contributed to this project. Chris Chua is currently making changes to the script. <br/>The modules shown here are not guaranteed to be 100% correct. Use at your own risk</p></div>
 </body>
 </html>
