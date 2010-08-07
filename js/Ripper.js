@@ -113,7 +113,7 @@ Ripper.prototype.ripLecture = function() {
 
 			//splitting the arrblock, to get separated piece of data
 			arrBlock = sBlock.split('<br>');
-			title = arrBlock[0].trim();
+			title = arrBlock[0].trim().substring(3);
 			
 			//session manipulation
 			nSession = Math.floor(arrBlock.length/2)-1;
@@ -137,9 +137,8 @@ Ripper.prototype.ripLecture = function() {
 					end = end + 30;
 				}
 				
-				if (/.*EVEN.*/.test(phrase2)) type = 2;
-				else if (/.*ODD.*/.test(phrase2)) type = 1;
-				else type = 0;
+				type = phrase2.indexOf("EVEN") != -1 ? 2 :
+					phrase2.indexOf("ODD") != -1 ? 1 : 0;
 				
 				//pushing cells that this session will occupy
 				for (t=start;t<end;t+=100) { arrCell.push('w'+day+'t'+t); }
@@ -171,11 +170,10 @@ Ripper.prototype.ripTutorial = function() {
 
 			//splitting the arrblock, to get separated piece of data
 			arrBlock = sBlock.split('<br>');
-			title = arrBlock[0].trim();
+			title = arrBlock[0].trim().substring(3);
 			
 			//tutorial type
-			if (/LABORATORY/.test(title)) tutType = 'lab';
-			else tutType = 'tut';
+			tutType = title.indexOf("LABORATORY") != -1 ? 'lab' : 'tut';
 			
 			//session manipulation
 			nSession = Math.floor(arrBlock.length/2)-1;
@@ -191,10 +189,9 @@ Ripper.prototype.ripTutorial = function() {
 				end = parseInt(res[3]);
 				place = res[4];
 				
-				if (/.*EVEN.*/.test(phrase2)) type = 2;
-				else if (/.*ODD.*/.test(phrase2)) type = 1;
-				else type = 0;
-				
+				type = phrase2.indexOf("EVEN") != -1 ? 2 :
+					phrase2.indexOf("ODD") != -1 ? 1 : 0;
+
 				//pushing cells that this session will occupy
 				for (t=start;t<end;t+=100) { arrCell.push('w'+day+'t'+t); }
 				
