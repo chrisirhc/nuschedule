@@ -2,6 +2,11 @@ var cellWidth = 55;
 var cellHeight = 40;
 
 function TimeTable() {
+	this.shortform = {'lecture': 'lec', 'tutorial': 'tut', 'laboratory': 'lab'};
+	this.longform = {};
+	for (var i in this.shortform) {
+		this.longform[this.shortform[i]] = i;
+	}
 	
 	this.module = new Array();
 	this.fixedArray = new Array();
@@ -29,24 +34,21 @@ TimeTable.prototype.resetTable = function() {
 };
 
 TimeTable.prototype.createTable = function() {
-	
-	elemMaster = document.getElementById('master');
-	
 	//cell manipulation
-	elemTable = document.createElement('div');
-	elemTable.setAttribute('id', 'tableMaster');
+	var elemTable = $('<div></div>').attr('id', 'tableMaster');
 	
 	for (i=0;i<6;i++) {
 		for (j=0;j<14;j++) {
-			var elemCell = document.createElement('div');
-			elemCell.setAttribute('id', 'w' + (i+1) + 't' + (j*100+800));
-			elemCell.setAttribute('style', 'width:'+(cellWidth-2)+'px;height:'+(cellHeight-2)+'px;top:'+(i*cellHeight+(i+1)*24)+'px;left:'+(j*cellWidth+j)+'px;');
-			elemCell.className = 'cell';
-			elemCell.innerHTML = j*100+800;
-			elemTable.appendChild(elemCell);
+			$("<div></div>")
+				.addClass('cell')
+				.attr('id', 'w' + (i+1) + 't' + (j*100+800))
+				.css({'width': (cellWidth-2), 'height': (cellHeight-2),
+				'top': (i*cellHeight+(i+1)*24), 'left': (j*cellWidth+j)})
+				.text(j*100+800)
+				.appendTo(elemTable);
 		}
 	}
-	elemMaster.appendChild(elemTable);
+	elemTable.appendTo('#master');
 };
 
 TimeTable.prototype.createAllNode = function(fixedArray, onTableArray) {
@@ -61,16 +63,10 @@ TimeTable.prototype.createAllNode = function(fixedArray, onTableArray) {
 	elemNodeMaster = document.getElementById('nodeMaster');
 	
 	if (! elemNodeMaster) { //if not set, create those elements
-		elemMaster = document.getElementById('master');
-		elemNodeMaster = document.createElement('div');
-		elemNodeMaster.setAttribute('id', 'nodeMaster');
-		elemTempNodeMaster = document.createElement('div');
-		elemTempNodeMaster.setAttribute('id', 'tempNodeMaster');
-		elemModuleViewer = document.createElement('moduleViewer');
-		elemModuleViewer.setAttribute('id','moduleViewer');
-		elemMaster.appendChild(elemNodeMaster);
-		elemMaster.appendChild(elemTempNodeMaster);
-		elemMaster.appendChild(elemModuleViewer);
+		$("#master")
+			.append($("<div></div>").attr('id', 'nodeMaster'))
+			.append($("<div></div>").attr('id', 'tempNodeMaster'))
+			.append($("<div></div>").attr('id', 'moduleViewer'));
 	}
 	
 	if (typeof onTableArray == 'object') { //if creating from a existing table
@@ -85,23 +81,14 @@ TimeTable.prototype.createAllNode = function(fixedArray, onTableArray) {
 			objPos = parseInt(arr[2]);
 			type = arr[1];
 			fixed = (fixedArray.indexOf(str) >= 0);
-			switch(type) {
-				case 'lec':
-				this.createNode(this.module[modPos].code, this.module[modPos].lecture[objPos], modPos, objPos, fixed);
-				break;
-				case 'tut':
-				this.createNode(this.module[modPos].code, this.module[modPos].tutorial[objPos], modPos, objPos, fixed);
-				break;
-				case 'lab':
-				this.createNode(this.module[modPos].code, this.module[modPos].laboratory[objPos], modPos, objPos, fixed);
-				break;
-			}
+			this.createNode(this.module[modPos].code,
+				this.module[modPos][this.longform[type]][objPos], modPos, objPos, fixed);
 		}
 		//after doing the creating of node, then reset cell, to prevent erroneous
 		
 		//this.cell = cell;
 		
-	}else{
+	} else {
 		//createModuleViewer
 		this.createModuleViewer();
 
@@ -131,7 +118,27 @@ TimeTable.prototype.createAllNode = function(fixedArray, onTableArray) {
 
 
 TimeTable.prototype.createModuleViewer = function (fixedArray, onTableArray) {
-	
+	var goThrough = function (type) {
+		/** background colours, these are constants to be put somewhere **/
+		var background = {'lecture': '#eee', 'tutorial': '#eec', 'laboratory': '#cee'};
+		innerHTML += '<div style="position:relative">';
+		for (n=0;n<this.module[m][type].length;n++) {
+			if (this.module[m][type][n].session.length == 0) continue; //skip this object if no session found
+			t += Math.floor(n / 6) * 17;
+			l = n%6 * 21;
+			mat = /\[(.+)\]/.exec(this.module[m][type][n].title)[1];
+			sel = (n == 0) ? '_sel' : '';
+			if (hasArray) {
+				sel = (onTableArray.indexOf(m+'_'+this.shortform[type]+'_'+n) >= 0) ? '_sel' : '';
+				sel = (fixedArray.indexOf(m+'_'+this.shortform[type]+'_'+n) >= 0) ? '_1' : sel;
+			}
+			id = 'k_'+m+'_'+this.shortform[type]+'_'+n;
+			innerHTML += '<div id="'+id+'" class="module_node'+sel+'" style="top:'+t+'px;left:'+l+'px;background-color:'+background[type]+';">'+mat+'</div>';
+		}
+		innerHTML += '</div>';
+		t += 20;
+	};
+
 	elemModuleViewer = document.getElementById('moduleViewer');
 	elemModuleViewer.innerHTML = ''; //clear this out
 	
@@ -142,6 +149,7 @@ TimeTable.prototype.createModuleViewer = function (fixedArray, onTableArray) {
 	
 	hasArray = (typeof onTableArray != 'undefined');
 	
+	/** loop through each module **/
 	for (m=0;m<this.module.length;m++) {
 		var top = Math.floor(m/6)*115+420;
 		var left = (m%6)*130+25;
@@ -152,58 +160,16 @@ TimeTable.prototype.createModuleViewer = function (fixedArray, onTableArray) {
 		innerHTML = '<div class="colorChooser" style="background-color:'+backgroundColor[m]+';"></div>';
 		innerHTML += '<h5>'+this.module[m].code+'&nbsp;<small>'+this.module[m].exam+'</small></h5>';
 		
-		
 		var t = 0; //use as padding lecture/tutorial/laboratory
 		if (this.module[m].hasLecture()) {
-			innerHTML += '<div style="position:relative">';
-			for (n=0;n<this.module[m].lecture.length;n++) {
-				if (this.module[m].lecture[n].session.length == 0) continue; //skip this object if no session found
-				t = Math.floor(n / 6) * 17;
-				l = n%6 * 21;
-				/.+\[(.+)\]/.test(this.module[m].lecture[n].title); mat = RegExp.$1;
-				sel = (n == 0) ? '_sel' : '';
-				if (hasArray) sel = (onTableArray.indexOf(m+'_lec_'+n) >= 0) ? '_sel' : '';
-				if (hasArray) sel = (fixedArray.indexOf(m+'_lec_'+n) >= 0) ? '_1' : sel;
-				id = 'k_'+m+'_lec_'+n;
-				innerHTML += '<div id="'+id+'" class="module_node'+sel+'" style="top:'+t+'px;left:'+l+'px;background-color:#eee;">'+mat+'</div>';
-			}
-			innerHTML += '</div>';
-			t += 20;
+			goThrough.call(this, "lecture");
 		}
-		padTop = t;
 		if (this.module[m].hasTutorial()) {
-			innerHTML += '<div style="position:relative">';
-			for (n=0;n<this.module[m].tutorial.length;n++) {
-				if (this.module[m].tutorial[n].session.length == 0) continue; //skip this object if no session found
-				t = padTop + Math.floor(n / 6) * 17;
-				l = n%6 * 21;
-				/.+\[(.+)\]/.test(this.module[m].tutorial[n].title); mat = RegExp.$1;
-				sel = (n == 0) ? '_sel' : '';
-				if (hasArray) sel = (onTableArray.indexOf(m+'_tut_'+n) >= 0) ? '_sel' : '';
-				if (hasArray) sel = (fixedArray.indexOf(m+'_tut_'+n) >= 0) ? '_1' : sel;
-				id = 'k_'+m+'_tut_'+n;
-				innerHTML += '<div id="'+id+'" class="module_node'+sel+'" style="top:'+t+'px;left:'+l+'px;background-color:#eec;">'+mat+'</div>';
-			}
-			innerHTML += '</div>';
-			t += 20;
+			goThrough.call(this, "tutorial");
 		}
-		padTop = t;
 		if (this.module[m].hasLaboratory()) {
-			innerHTML += '<div style="position:relative">';
-			for (n=0;n<this.module[m].laboratory.length;n++) {
-				if (this.module[m].laboratory[n].session.length == 0) continue; //skip this object if no session found
-				t = padTop + Math.floor(n / 6) * 17;
-				l = n%6 * 21;
-				/.+\[(.+)\]/.test(this.module[m].laboratory[n].title); mat = RegExp.$1;
-				sel = (n == 0) ? '_sel' : '';
-				if (hasArray) sel = (onTableArray.indexOf(m+'_lab_'+n) >= 0) ? '_sel' : '';
-				if (hasArray) sel = (fixedArray.indexOf(m+'_lab_'+n) >= 0) ? '_1' : sel;
-				id = 'k_'+m+'_lab_'+n;
-				innerHTML += '<div id="'+id+'" class="module_node'+sel+'" style="top:'+t+'px;left:'+l+'px;background-color:#cee;">'+mat+'</div>';
-			}
-			innerHTML += '</div>';
+			goThrough.call(this, "laboratory");
 		}
-		
 		
 		elemModule.innerHTML = innerHTML;
 		
@@ -218,7 +184,7 @@ TimeTable.prototype.createNode = function(moduleCode, obj, modulePos, objPos, fi
 	//fixed is an optional parameter.
 	//indicate whether the node is a fixed node. Prefix with f_
 	//its tab will be prefixed with e_
-	if (typeof fixed == 'undefined') fixed = false;
+	fixed = fixed || false;
 	if (fixed) this.fixedArray.push(modulePos+'_'+obj.type+'_'+objPos);
 	
 	//add in onTableArray
@@ -352,6 +318,7 @@ TimeTable.prototype.showNode = function(moduleCode, obj, modulePos, objPos) { //
 
 TimeTable.prototype.swapNode = function(targetNode, oldNode, fixed) {
 	
+	/** TODO Bug here **/
 	//removing old node first
 	arrElemId = oldNode.attr('id').split('_');
 	elemId = 's_'+arrElemId[1]+'_'+arrElemId[2]+'_'+arrElemId[3];
@@ -359,17 +326,15 @@ TimeTable.prototype.swapNode = function(targetNode, oldNode, fixed) {
 		
 	//fixed is an optional parameter.
 	//indicate whether the node is a fixed node.
-	if (typeof fixed == 'undefined') fixed = false;
+	fixed = fixed || false;
 	
 	//insert a new node
 	arrT = targetNode.attr('id').split('_');
 	mid = parseInt(arrT[1]);
 	type = arrT[2];
  	oid= parseInt(arrT[3]);
-	if (type == 'lec') this.createNode(this.module[mid].code, this.module[mid].lecture[oid], mid, oid, fixed );
-	if (type == 'tut') this.createNode(this.module[mid].code, this.module[mid].tutorial[oid], mid, oid, fixed );
-	if (type == 'lab') this.createNode(this.module[mid].code, this.module[mid].laboratory[oid], mid, oid, fixed );
-
+	this.createNode(this.module[mid].code,
+		this.module[mid][this.longform[type]][oid], mid, oid, fixed);
 };
 
 TimeTable.prototype.shortenTitle = function(title) {
@@ -431,9 +396,7 @@ TimeTable.prototype.removeNode = function(node) {
 		omid = parseInt(arrOld[1]);
 		otype = arrOld[2];
 		ooid = parseInt(arrOld[3]);
-		if (otype == 'lec') this.unmark(this.module[omid].lecture[ooid], node.id);
-		if (otype == 'tut') this.unmark(this.module[omid].tutorial[ooid], node.id);
-		if (otype == 'lab') this.unmark(this.module[omid].laboratory[ooid], node.id);
+		this.unmark(this.module[omid][this.longform[otype]][ooid], node.id);
 	}
 	
 };
