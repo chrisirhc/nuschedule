@@ -53,7 +53,18 @@ Ripper.prototype.rip = function() {
 	//give ripper's url to current url
 	this.url = url;
 	if (code != ''){ //if not empty, do ripping
-		request(this.url);
+		$.get(this.url, (function(_ripper) { return function(data) {
+			if (data.indexOf("Module Detailed Information for") != -1) {
+				// set the sPage
+				_ripper.sPage = data;
+				_ripper.$page = $(data);
+				_ripper.getModule();
+				$('#img'+ripIndex).attr('src',imgOK.src);
+			}else{
+				$('#img'+ripIndex).attr('src',imgError.src);
+			}
+			_ripper.ripNext();
+		}})(this));
 	} else {
 		$('#img'+ripIndex).attr('src', imgBlank.src);
 		this.ripNext();
@@ -215,9 +226,10 @@ Ripper.prototype.ripNext = function() {
 		ripper.rip();
 	} else {
 		$('#ripButton').val('Re-Scan All').mouseup(ripper.start);
-		if (tt.module.length > 0){ 
-            document.getElementById('nextButton').style.display='inline'; //show NEXT button if module>0
-        }
+		if (tt.module.length > 0){
+			//show NEXT button if module>0
+			$("#nextButton").show();
+		}
 		if (autoStart) {
 			tt.createTable();tt.createAllNode();st.showSetFunctions();showPage3();
 			setTimeout("alert('Here you are. Happy testing! :)')", 900);
@@ -227,25 +239,6 @@ Ripper.prototype.ripNext = function() {
 };
 
 function convertDay(str) {
-	if (str == 'MONDAY') return 1;
-	else if (str == 'TUESDAY') return 2;
-	else if (str == 'WEDNESDAY') return 3;
-	else if (str == 'THURSDAY') return 4;
-	else if (str == 'FRIDAY') return 5;
-	else if (str == 'SATURDAY') return 6;
-	else if (str == 'SUNDAY') return 7;
-};
-
-function request(url) {
-	$.get(url, function(data) {
-		if (/Module Detailed Information for/i.test(data)) {
-			ripper.sPage = data;
-			ripper.$page = $(data);
-			ripper.getModule();
-			$('#img'+ripIndex).attr('src',imgOK.src);
-		}else{
-			$('#img'+ripIndex).attr('src',imgError.src);
-		}
-		ripper.ripNext();
-	});
+	return {'MONDAY': 1, 'TUESDAY': 2, 'WEDNESDAY': 3,
+	'THURSDAY': 4, 'FRIDAY': 5, 'SATURDAY': 6, 'SUNDAY': 7}[str];
 };
