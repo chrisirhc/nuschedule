@@ -53,7 +53,7 @@ Ripper.prototype.rip = function() {
 	//give ripper's url to current url
 	this.url = url;
 	if (code != ''){ //if not empty, do ripping
-		request('readModule.php?url='+escape(this.url));
+		request(this.url);
 	} else {
 		$('#img'+ripIndex).attr('src', imgBlank.src);
 		this.ripNext();
@@ -102,7 +102,7 @@ Ripper.prototype.getModule = function () {
 
 Ripper.prototype.ripLecture = function() {
 	
-	var $lectureTable = $("table.tableframe:eq(1)", this.$page);
+	var $lectureTable = $("table.tableframe:eq(0) ~ table:eq(0)", this.$page);
 
 	arrLecture = new Array();
 	
@@ -123,11 +123,11 @@ Ripper.prototype.ripLecture = function() {
 				phrase2 = arrBlock[i*2+2];
 				arrCell = new Array();
 				
-				/(\w+) From (\d+) hrs to (\d+) hrs in (.+),/.test(phrase1);
-				day = convertDay(RegExp.$1);
-				start = parseInt(RegExp.$2);
-				end = parseInt(RegExp.$3);
-				place = RegExp.$4;
+				var res = /(\w+)\s+From\s+(\d+)\s+hrs\s+to\s+(\d+)\s+hrs\s+in\s+(.+),/.exec(phrase1);
+				day = convertDay(res[1]);
+				start = parseInt(res[2]);
+				end = parseInt(res[3]);
+				place = res[4];
 				
 				// test if number is half hour
 				if ((start) % 100 != 0) {
@@ -160,7 +160,7 @@ Ripper.prototype.ripLecture = function() {
 
 Ripper.prototype.ripTutorial = function() {
 
-	var $tutorialTable = $("table.tableframe:eq(2)", this.$page);
+	var $tutorialTable = $("table.tableframe:eq(0) ~ table:eq(1)", this.$page);
 	
 	arrTutorial = new Array();
 	
@@ -185,11 +185,11 @@ Ripper.prototype.ripTutorial = function() {
 				phrase2 = arrBlock[i*2+2];
 				arrCell = new Array();
 
-				/(\w+) From (\d+) hrs to (\d+) hrs in (.+),/.test(phrase1);
-				day = convertDay(RegExp.$1);
-				start = parseInt(RegExp.$2);
-				end = parseInt(RegExp.$3);
-				place = RegExp.$4;
+				var res = /(\w+)\s+From\s+(\d+)\s+hrs\s+to\s+(\d+)\s+hrs\s+in\s+(.+),/.exec(phrase1);
+				day = convertDay(res[1]);
+				start = parseInt(res[2]);
+				end = parseInt(res[3]);
+				place = res[4];
 				
 				if (/.*EVEN.*/.test(phrase2)) type = 2;
 				else if (/.*ODD.*/.test(phrase2)) type = 1;
