@@ -7,6 +7,7 @@ document.onmousedown = function(e) {
 	e = (jQuery.browser.msie) ? window.event : e;
 	targetElem = (jQuery.browser.msie) ? e.srcElement : e.target;
 	if (targetElem.tagName == 'B') targetElem = targetElem.parentNode; //fix <B> problem in safari
+	if (!targetElem.id) return;
 	jObj = $('#'+targetElem.id); //work like $(this)
 	
 	
@@ -45,6 +46,7 @@ document.onmousedown = function(e) {
 document.onmouseup = function(e) {
 	targetElem = (jQuery.browser.msie) ? e.srcElement : e.target;
 	if (targetElem.tagName == 'B') targetElem = targetElem.parentNode; //fix <B> problem in safari
+	if (!targetElem.id) return;
 	jObj = $('#'+targetElem.id); //work like $(this)
 	
 	if (dragging) {
@@ -73,6 +75,7 @@ document.onmousemove = function(e) {
 document.onmouseover = function(e) {
 	targetElem = (jQuery.browser.msie) ? e.srcElement : e.target;
 	if (targetElem.tagName == 'B') targetElem = targetElem.parentNode; //fix <B> problem in safari
+	if (!targetElem.id) return;
 	jObj = $('#'+targetElem.id); //work like $(this)
 	
 	if (/(^b_|^t_)/.test(targetElem.id)) {
@@ -83,6 +86,7 @@ document.onmouseover = function(e) {
 document.onmouseout = function(e) {
 	targetElem = (jQuery.browser.msie) ? e.srcElement : e.target;
 	if (targetElem.tagName == 'B') targetElem = targetElem.parentNode; //fix <B> problem in safari
+	if (!targetElem.id) return;
 	jObj = $('#'+targetElem.id); //work like $(this)
 	
 	if (/(^b_|^t_)/.test(targetElem.id)) {

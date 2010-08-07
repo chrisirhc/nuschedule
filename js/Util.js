@@ -9,9 +9,12 @@ if(!Array.indexOf){
 	}
 }
 
-String.prototype.trim = function() { 
-	var reExtraSpace = /^\s*(.*?)\s*$/; 
-	return this.replace(reExtraSpace, "$1"); 
+String.prototype.trim = function () {
+	var str = this.replace(/^\s\s*/, ''),
+		ws = /\s/,
+		i = str.length;
+	while (ws.test(str.charAt(--i)));
+	return str.slice(0, i + 1);
 };
 
 function createP(){

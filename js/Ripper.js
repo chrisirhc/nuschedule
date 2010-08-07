@@ -22,8 +22,7 @@ Ripper.prototype.start = function() {
 		}
 	}
 	if (proceed) {
-		$('#ripButton').val('Waiting...');
-		$('#ripButton').mouseup(function() { return false; });
+		$('#ripButton').val('Waiting...').mouseup(function() { return false; });
 		$('#nextButton').hide();
 		for (i=1;i<=maxRipIndex;i++) {
 			if ($('#code'+i).val() != '') $('#img'+i).attr('src', imgLoader.src);
@@ -62,19 +61,20 @@ Ripper.prototype.rip = function() {
 };
 
 Ripper.prototype.getModule = function () {
+  /** All regex into XPath / jQuery selectors **/
+  /** Benchmark speed? **/
+  // var $moduleInfoTable = $("table:first>tbody>tr:eq(1)>td>table>tbody>tr:eq(2)>td>table>tbody", this.$page);
+	var $moduleInfoTable = $("table.tableframe:eq(0)", this.$page);
 	
 	//ripping module code
-	/\<td width="70%"\>(\w+)/.test(this.sPage);
-	var moduleCode = RegExp.$1.trim();
+	var moduleCode =
+    $("tr:eq(1)>td:eq(1)", $moduleInfoTable).text().trim();
 	var url = this.url;
 	
 	//exam day
-	if (/(\d\d\-\d\d\-\d\d\d\d)\s\w+\<br\>/.test(this.sPage)) {
-		var examDate = RegExp.$1;
-	}else{
-		var examDate = 'No exam';
-	}
-	
+	//	var examDate = 'No exam'; // Now it's just "No Exam Date."
+	var examDate =
+		$("tr:eq(5)>td:eq(1)", $moduleInfoTable).text().trim().replace(/\s+(A|P)M$/, "");
 	
 	//ripping lecture, tutorial and laboratory.
 	var arrLecture = this.ripLecture();
@@ -102,24 +102,15 @@ Ripper.prototype.getModule = function () {
 
 Ripper.prototype.ripLecture = function() {
 	
+	var $lectureTable = $("table.tableframe:eq(1)", this.$page);
+
 	arrLecture = new Array();
 	
-	if (! /No Lecture Class/.test(this.sPage)) { //has lecture
-		
-		iBlockStart = this.sPage.indexOf("<td colspan=\"4\"><b>Lecture Time Table</b></td>");
-		iBlockEnd = this.sPage.indexOf("<table width=\"100%\" border=\"1\"",iBlockStart);
-		lectureBlock = this.sPage.substring(iBlockStart,iBlockEnd);
-		
-		iEnd = 1; //skip the first <td colspan="4">
-		
+	// if (! /No Lecture Class/.test(this.sPage)) { //has lecture
 		//ripping all the lectures
-		while (true) {
-			
-			iStart = lectureBlock.indexOf("<td colspan=\"4\">", iEnd);
-			iEnd= lectureBlock.indexOf("</table>",iStart);
-			sBlock = lectureBlock.substring(iStart+16, iEnd);
-			if (iStart < 1) break; //break when it wrap back = no more
-			
+		$("table", $lectureTable).each(function() {
+			sBlock = $("td", this).html();
+
 			//splitting the arrblock, to get separated piece of data
 			arrBlock = sBlock.split('<br>');
 			title = arrBlock[0].trim();
@@ -160,33 +151,24 @@ Ripper.prototype.ripLecture = function() {
 			
 			//insert new lecture
 			arrLecture.push(new Part(title, 'lec', arrSession));
-		}//end of lecture while loop
+		});
 
-	}//end if
+	// }//end if
 		
 	return arrLecture;
 };
 
 Ripper.prototype.ripTutorial = function() {
+
+	var $tutorialTable = $("table.tableframe:eq(2)", this.$page);
 	
 	arrTutorial = new Array();
 	
-	if (! /No Tutorial Class/.test(this.sPage)) { //has tutorial
-		
-		iBlockStart = this.sPage.indexOf("<td><a name=\"TutorialTimeTable\"><b>");
-		iBlockEnd = this.sPage.indexOf("<!-- Check to see if required",iBlockStart);
-		tutorialBlock = this.sPage.substring(iBlockStart,iBlockEnd);
-		//alert(tutorialBlock);
-		
-		iEnd = 0;
-		
+	// if (! /No Tutorial Class/.test(this.sPage)) { //has tutorial
 		//ripping all the tutorials
-		while (true) {
-			iStart = tutorialBlock.indexOf("<td colspan=\"4\">", iEnd);
-			iEnd= tutorialBlock.indexOf("</table>",iStart);
-			sBlock = tutorialBlock.substring(iStart+16, iEnd);
-			if (iStart < 1) break; //break when it wrap back = no more
-			
+		$("table", $tutorialTable).each(function() {
+			sBlock = $("td", this).html();
+
 			//splitting the arrblock, to get separated piece of data
 			arrBlock = sBlock.split('<br>');
 			title = arrBlock[0].trim();
@@ -223,21 +205,19 @@ Ripper.prototype.ripTutorial = function() {
 			
 			//insert new tutorial
 			arrTutorial.push(new Part(title, tutType, arrSession));
-		}//end of lecture while loop
+		});
 
-	}//end if
+	// }//end if
 		
 	return arrTutorial;
 };
 
 Ripper.prototype.ripNext = function() {
-	
        
 	if (++ripIndex <= maxRipIndex) {
 		ripper.rip();
 	} else {
-		$('#ripButton').val('Re-Scan All');
-		$('#ripButton').mouseup(ripper.start);
+		$('#ripButton').val('Re-Scan All').mouseup(ripper.start);
 		if (tt.module.length > 0){ 
             document.getElementById('nextButton').style.display='inline'; //show NEXT button if module>0
         }
@@ -263,6 +243,7 @@ function request(url) {
 	$.get(url, function(data) {
 		if (/Module Detailed Information for/i.test(data)) {
 			ripper.sPage = data;
+			ripper.$page = $(data);
 			ripper.getModule();
 			$('#img'+ripIndex).attr('src',imgOK.src);
 		}else{
