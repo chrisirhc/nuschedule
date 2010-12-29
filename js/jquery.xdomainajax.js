@@ -53,17 +53,18 @@ jQuery.ajax = (function(_ajax){
             
             o.success = (function(_success){
                 return function(data) {
-                    
                     if (_success) {
+                        var result = data.results[0];
+                        // strangely, might be null
+                        if (result != null) {
+                            // YQL screws with <script>s
+                            // Get rid of them
+                            result = result.replace(/<script[^>]+?\/>|<script(.|\s)*?\/script>/gi, '');
+                        }
                         // Fake XHR callback.
-                        _success.call(this, data.results[0]
-                                // YQL screws with <script>s
-                                // Get rid of them
-                                .replace(/<script[^>]+?\/>|<script(.|\s)*?\/script>/gi, '')
-															, 'success', { responseText: data.results[0] }
-														);
+                        _success.call(this, result, 'success',
+                                      { responseText: data.results[0] });
                     }
-                    
                 };
             })(o.success);
             
