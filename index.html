@@ -67,13 +67,27 @@
             <p style="margin-bottom:10px;color:#f33;">Look Here! <a href="javascript://" onclick="ripInto();ripper.testApplication();">Just wanna test this application? Click here.</a> (I will fill some example for you to play with)</p>
 
 			<script type="text/javascript">
-			d = new Date();
-			year = d.getFullYear();
-			//val1 = (year-1)+'/'+(year); <option value="'+val1+'">'+val1+'</option>
-			val2 = (year)+'/'+(year+1);
-			document.write('<p style="margin:30px 0 10px;">Academic Year: <select id="ay" style="margin-right:10px;"><option value="'+val2+'">'+val2+'</option></select>');
-			document.write('<select id="semester"><option value="1">Semester 1</option><option value="2">Semester 2</option></select></p>');
+jQuery(document).ready(function($) {
+	var d = new Date();
+	var y1, y2, sem;
+	y1 = y2 = d.getFullYear();
+	// sem 2 is up to april
+	if (d.getMonth() <= 3) {
+		y1--;
+		sem = 2;
+	} else {
+		y2++;
+		sem = 1;
+	}
+	$("#ay option").each(function() {
+		this.value = this.innerHTML = y1+"/"+y2;
+		return false;
+	});
+	$("#semester").first().val(sem);
+});
 			</script>
+            <p style="margin:30px 0 10px;">Academic Year: <select id="ay" style="margin-right:10px;"><option value=""></option></select>
+            <select id="semester"><option value="1">Semester 1</option><option value="2">Semester 2</option></select></p>
             <div id="boxes"></div>
 </div>
 			<div style="background:#000;margin-top:220px;color:#aaa;padding:10px 0 30px;">
