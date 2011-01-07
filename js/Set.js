@@ -135,7 +135,7 @@ Set.prototype.readModuleCode = function(setId) {
 
 Set.prototype.saveCookie = function(setId) {
 	u = this.ripModuleInfo() + '-' + this.ripOnTableArray() + '-' + this.ripFixedArray();
-	setCookie('module_set'+setId, u, new Date(Date.parse("Jan 1, 2010")));
+	setCookie('module_set'+setId, u, new Date(Date.parse("Jan 1, 3010")));
 };
 Set.prototype.removeCookie = function(setId) {
 	setCookie('module_set'+setId, '', new Date(Date.parse("Jan 1, 2010")));
