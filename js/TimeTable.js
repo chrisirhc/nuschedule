@@ -124,7 +124,7 @@ TimeTable.prototype.createModuleViewer = function (fixedArray, onTableArray) {
 		innerHTML += '<div style="position:relative">';
 		for (n=0;n<this.module[m][type].length;n++) {
 			if (this.module[m][type][n].session.length == 0) continue; //skip this object if no session found
-			t += Math.floor(n / 6) * 17;
+			t = Math.floor(n / 6) * 17;
 			l = n%6 * 21;
 			mat = /\[(.+)\]/.exec(this.module[m][type][n].title)[1];
 			sel = (n == 0) ? '_sel' : '';
